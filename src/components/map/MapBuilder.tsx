@@ -82,6 +82,7 @@ export default function MapBuilder({ storeId: propStoreId, versionId: propVersio
   // Path simulation
   const [simPath, setSimPath] = useState<NavigationNode[] | null>(null);
   const [simDistance, setSimDistance] = useState(0);
+  const [simError, setSimError] = useState<string | null>(null);
 
   // Dialogs
   const [showQrDialogFor, setShowQrDialogFor] = useState<string | null>(null);
@@ -628,19 +629,22 @@ export default function MapBuilder({ storeId: propStoreId, versionId: propVersio
     if (result.found) {
       setSimPath(result.waypoints);
       setSimDistance(result.totalDistance);
+      setSimError(null);
       setStatusMsg(
         `Path found: ${result.waypoints.length} waypoints, ${result.totalDistance.toFixed(1)}m`
       );
     } else {
       setSimPath(null);
       setSimDistance(0);
-      setStatusMsg('No path found — ensure nodes are connected with edges');
+      setSimError('No valid path found. Please ensure the Start Node and Destination Node are connected by edges.');
+      setStatusMsg('Path simulation failed.');
     }
   }
 
   function handleClearSimulation() {
     setSimPath(null);
     setSimDistance(0);
+    setSimError(null);
   }
 
   function buildGraphFromState(): NavigationGraph {
@@ -945,8 +949,6 @@ export default function MapBuilder({ storeId: propStoreId, versionId: propVersio
           selectedSection={selectedSection}
           onUpdateType={handleUpdateNodeType}
           onUpdateLabel={handleUpdateNodeLabel}
-          onCreateSection={handleCreateSection}
-          onDeleteSection={handleDeleteSection}
           onDeleteNode={(nodeId) => {
             setNodes((prev) => prev.filter((n) => n.id !== nodeId));
             setEdges((prev) =>
@@ -975,6 +977,7 @@ export default function MapBuilder({ storeId: propStoreId, versionId: propVersio
         sections={sections}
         simulatedPath={simPath}
         simulatedDistance={simDistance}
+        simError={simError}
         onSimulate={handleSimulate}
         onClear={handleClearSimulation}
       />

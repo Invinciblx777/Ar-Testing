@@ -8,8 +8,6 @@ interface PropertiesPanelProps {
   selectedSection: MapSection | null;
   onUpdateType: (nodeId: string, type: NodeType) => void;
   onUpdateLabel: (nodeId: string, label: string) => void;
-  onCreateSection: (nodeId: string, name: string, category: string, description: string) => void;
-  onDeleteSection: (nodeId: string) => void;
   onDeleteNode: (nodeId: string) => void;
   onPrintQr?: (nodeId: string) => void;
 }
@@ -19,8 +17,6 @@ export default function PropertiesPanel({
   selectedSection,
   onUpdateType,
   onUpdateLabel,
-  onCreateSection,
-  onDeleteSection,
   onDeleteNode,
   onPrintQr,
 }: PropertiesPanelProps) {
@@ -124,48 +120,23 @@ export default function PropertiesPanel({
         {selectedNode.type === 'section' && (
           <div className="pt-3 border-t border-white/10">
             <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-2">
-              Section Metadata
+              Destination Link
             </label>
-            <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                value={sectionName}
-                onChange={(e) => setSectionName(e.target.value)}
-                placeholder="Name (e.g. Electronics)"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white/80 placeholder-white/20 outline-none focus:border-accent/40 transition-colors"
-              />
-              <input
-                type="text"
-                value={sectionCategory}
-                onChange={(e) => setSectionCategory(e.target.value)}
-                placeholder="Category (e.g. Technology)"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white/80 placeholder-white/20 outline-none focus:border-accent/40 transition-colors"
-              />
-              <textarea
-                value={sectionDescription}
-                onChange={(e) => setSectionDescription(e.target.value)}
-                placeholder="Description"
-                rows={2}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white/80 placeholder-white/20 outline-none focus:border-accent/40 transition-colors resize-none"
-              />
-              <button
-                onClick={() => {
-                  if (sectionName.trim()) {
-                    onCreateSection(selectedNode.id, sectionName.trim(), sectionCategory.trim(), sectionDescription.trim());
-                  }
-                }}
-                className="w-full py-2 rounded-lg bg-accent/15 text-accent text-xs font-medium border border-accent/30 hover:bg-accent/25 transition-colors"
-              >
-                {selectedSection ? 'Update Section' : 'Create Section'}
-              </button>
-            </div>
-            {selectedSection && (
-              <button
-                onClick={() => onDeleteSection(selectedNode.id)}
-                className="mt-3 w-full text-center text-[10px] text-red-400/60 hover:text-red-400 transition-colors"
-              >
-                Remove section
-              </button>
+            <p className="text-[10px] text-white/60 mb-3 leading-snug">
+              This node is designated as a destination anchor. Head over to the <a href="/admin/destinations" target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300 font-medium">Destinations Dashboard</a> to link it to a specific section name, category, and icon.
+            </p>
+            {selectedSection ? (
+              <div className="bg-white/5 border border-white/10 px-3 py-2 rounded text-xs text-white/80">
+                <span className="text-white/40 text-[9px] uppercase tracking-wider block mb-1">Linked Destination</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{selectedSection.icon || '📍'}</span>
+                  <span className="font-semibold">{selectedSection.name}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded text-[10px] text-amber-500">
+                This node is currently unlinked.
+              </div>
             )}
           </div>
         )}

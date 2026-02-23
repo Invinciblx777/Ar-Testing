@@ -181,24 +181,8 @@ async function handleSave(supabase: any, body: any) {
         }
     }
 
-    // 4. Replace all sections
-    await supabase.from('sections').delete().eq('floor_id', floorId);
-
-    if (sections && sections.length > 0) {
-        const { error: secErr } = await supabase.from('sections').insert(
-            sections.map((s: { id: string; name: string; node_id: string; category?: string; description?: string }) => ({
-                id: s.id,
-                name: s.name,
-                node_id: s.node_id,
-                floor_id: floorId,
-                category: s.category || null,
-                description: s.description || null,
-            }))
-        );
-        if (secErr) {
-            return NextResponse.json({ error: `Sections save failed: ${secErr.message}` }, { status: 500 });
-        }
-    }
+    // Sections are not overwritten here. They are managed by the Destination Management System.
+    // The ON DELETE CASCADE or explicit DB cleanup above handles orphaned sections.
 
     return NextResponse.json({ success: true });
 }

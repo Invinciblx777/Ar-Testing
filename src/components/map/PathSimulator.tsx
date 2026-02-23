@@ -9,6 +9,7 @@ interface PathSimulatorProps {
   sections: MapSection[];
   simulatedPath: NavigationNode[] | null;
   simulatedDistance: number;
+  simError: string | null;
   onSimulate: (startNodeId: string, targetSectionId: string) => void;
   onClear: () => void;
 }
@@ -18,6 +19,7 @@ export default function PathSimulator({
   sections,
   simulatedPath,
   simulatedDistance,
+  simError,
   onSimulate,
   onClear,
 }: PathSimulatorProps) {
@@ -122,7 +124,7 @@ export default function PathSimulator({
       </button>
 
       {/* Clear button */}
-      {simulatedPath && (
+      {(simulatedPath || simError) && (
         <button
           onClick={onClear}
           className="px-3 py-1 rounded-lg text-[11px] font-medium text-white/40 border border-white/10 hover:bg-white/5 transition-colors"
@@ -131,20 +133,36 @@ export default function PathSimulator({
         </button>
       )}
 
-      {/* Path info */}
-      {simulatedPath && (
-        <div className="flex items-center gap-3 ml-auto text-[11px] text-white/50">
-          <span>
-            {simulatedPath.length} waypoints
-          </span>
-          <span className="text-accent font-medium">
-            {simulatedDistance.toFixed(1)}m
-          </span>
-          <span className="text-emerald-400 font-medium">
-            ~{Math.round(simulatedDistance / 1.4)}s walk
-          </span>
-        </div>
-      )}
+      {/* Path info and Waypoints */}
+      <div className="flex-1 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center gap-4 pl-4 pr-2">
+        {simError && (
+          <div className="text-[11px] text-red-500 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded font-semibold flex items-center gap-2">
+            <span>⚠️</span> {simError}
+          </div>
+        )}
+
+        {simulatedPath && (
+          <>
+            <div className="flex items-center gap-3 text-[11px] text-white/50 shrink-0 border-r border-white/10 pr-4">
+              <span>{simulatedPath.length} nodes</span>
+              <span className="text-accent font-medium">{simulatedDistance.toFixed(1)}m</span>
+              <span className="text-emerald-400 font-medium">~{Math.round(simulatedDistance / 1.4)}s walk</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-[10px] text-white/70">
+              <span className="text-white/30 font-semibold uppercase tracking-wider mr-1">Route:</span>
+              {simulatedPath.map((node, i) => (
+                <span key={`${node.id}-${i}`} className="flex items-center gap-1.5">
+                  <span className="bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-[10px]">
+                    {node.label || `Node ${node.id.slice(0, 4)}`}
+                  </span>
+                  {i < simulatedPath.length - 1 && <span className="text-white/20">→</span>}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

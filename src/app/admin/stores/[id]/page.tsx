@@ -27,6 +27,16 @@ export default function StoreDetailPage({
     const [versions, setVersions] = useState<StoreVersion[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+
+    // Validation State
+    const [isValidating, setIsValidating] = useState(false);
+    const [validationReport, setValidationReport] = useState<{
+        versionId: string;
+        valid: boolean;
+        errors: string[];
+        stats: { nodes: number; edges: number; destinations: number };
+    } | null>(null);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -48,13 +58,41 @@ export default function StoreDetailPage({
         setLoading(false);
     }
 
-    async function handlePublish(versionId: string) {
+    // 1. First trigger validation
+    async function handlePublishRequest(versionId: string) {
+        setIsValidating(true);
+        setValidationReport(null);
+        try {
+            const res = await fetch('/api/admin/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ versionId }),
+            });
+            const data = await res.json();
+            setValidationReport({
+                versionId,
+                valid: data.valid,
+                errors: data.errors || [],
+                stats: data.stats || { nodes: 0, edges: 0, destinations: 0 },
+            });
+        } catch (err) {
+            console.error('Validation failed:', err);
+            alert('A network error occurred during validation.');
+        }
+        setIsValidating(false);
+    }
+
+    // 2. Proceed to actual publish if valid
+    async function confirmPublish() {
+        if (!validationReport?.valid) return;
+
         setActionLoading(true);
         await fetch('/api/admin/stores', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'publish', versionId, storeId }),
+            body: JSON.stringify({ action: 'publish', versionId: validationReport.versionId, storeId }),
         });
+        setValidationReport(null);
         await loadData();
         setActionLoading(false);
     }
@@ -174,10 +212,10 @@ export default function StoreDetailPage({
                             <VersionCard
                                 key={v.id}
                                 version={v}
-                                onPublish={handlePublish}
+                                onPublish={handlePublishRequest}
                                 onRevert={handleRevert}
                                 onEdit={handleEdit}
-                                isPublishing={actionLoading}
+                                isPublishing={actionLoading || isValidating}
                             />
                         ))}
                     </div>
@@ -206,6 +244,75 @@ export default function StoreDetailPage({
                     </div>
                 </div>
             </div>
+
+            {/* Validation Modal */}
+            {validationReport && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-[#151522] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col">
+                        <div className="p-6 border-b border-white/10 shrink-0">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                {validationReport.valid ? (
+                                    <><span className="text-emerald-400">✓</span> Validation Passed</>
+                                ) : (
+                                    <><span className="text-red-400">⚠️</span> Validation Failed</>
+                                )}
+                            </h2>
+                            <p className="text-sm text-white/50 mt-1">Pre-publish system integrity check.</p>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto max-h-[60vh]">
+                            <div className="flex gap-4 mb-6 text-sm">
+                                <div className="bg-white/5 px-3 py-2 rounded flex-1 text-center">
+                                    <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Nodes</div>
+                                    <div className="text-white font-medium">{validationReport.stats.nodes}</div>
+                                </div>
+                                <div className="bg-white/5 px-3 py-2 rounded flex-1 text-center">
+                                    <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Edges</div>
+                                    <div className="text-white font-medium">{validationReport.stats.edges}</div>
+                                </div>
+                                <div className="bg-white/5 px-3 py-2 rounded flex-1 text-center">
+                                    <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Dests</div>
+                                    <div className="text-white font-medium">{validationReport.stats.destinations}</div>
+                                </div>
+                            </div>
+
+                            {validationReport.errors.length > 0 ? (
+                                <ul className="space-y-2">
+                                    {validationReport.errors.map((err, i) => (
+                                        <li key={i} className="text-sm text-red-400/90 bg-red-400/10 px-4 py-3 rounded-lg border border-red-400/20 flex items-start gap-3 leading-snug">
+                                            <span className="shrink-0 mt-0.5">•</span>
+                                            <span>{err}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="text-center py-6 text-emerald-400/90 bg-emerald-400/10 rounded-lg border border-emerald-400/20">
+                                    <p className="font-medium">All systems green.</p>
+                                    <p className="text-xs mt-1 text-emerald-400/60">The navigation graph is fully contiguous and ready for AR customers.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-white/10 bg-white/[0.02] shrink-0 flex gap-3 justify-end">
+                            <button
+                                onClick={() => setValidationReport(null)}
+                                className="px-5 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            {validationReport.valid && (
+                                <button
+                                    onClick={confirmPublish}
+                                    disabled={actionLoading}
+                                    className="px-5 py-2.5 rounded-lg text-sm font-medium bg-[#10b981] hover:bg-[#059669] text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all disabled:opacity-50"
+                                >
+                                    {actionLoading ? 'Publishing...' : 'Yes, Publish Version'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
