@@ -232,22 +232,35 @@ export async function fetchNavigationGraphForVersion(versionId: string): Promise
 
         const floorIds = floors.map((f: { id: string }) => f.id);
 
-        // Fetch nodes, edges, sections for these floors
-        const [nodesRes, edgesRes, sectionsRes] = await Promise.all([
+        // Fetch nodes and edges for these floors
+        const [nodesRes, edgesRes] = await Promise.all([
             supabase.from('navigation_nodes').select('*').in('floor_id', floorIds),
             supabase.from('navigation_edges').select('*').in('floor_id', floorIds),
-            supabase.from('sections').select('*').in('floor_id', floorIds).order('name'),
         ]);
 
-        if (nodesRes.error || edgesRes.error || sectionsRes.error) {
+        if (nodesRes.error || edgesRes.error) {
             console.error('[AR Nav] Fetch error for version', versionId);
             return buildFallbackGraph();
+        }
+
+        // Fetch sections via node_id (not floor_id, which may be stale)
+        const nodeIds = (nodesRes.data || []).map((n: { id: string }) => n.id);
+        let sectionsData: StoreSection[] = [];
+        if (nodeIds.length > 0) {
+            const { data: secs, error: secErr } = await supabase
+                .from('sections')
+                .select('*')
+                .in('node_id', nodeIds)
+                .order('name');
+            if (!secErr && secs) {
+                sectionsData = secs as StoreSection[];
+            }
         }
 
         return buildGraph(
             nodesRes.data as NavigationNode[],
             edgesRes.data as NavigationEdge[],
-            sectionsRes.data as StoreSection[],
+            sectionsData,
             floors as Floor[]
         );
     } catch (err) {

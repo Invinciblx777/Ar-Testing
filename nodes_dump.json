@@ -1,0 +1,44 @@
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000007",
+    "label": "Groceries Section",
+    "type": "section",
+    "floor_id": "10000000-0000-0000-0000-000000000001"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000011",
+    "label": "Electronics Section",
+    "type": "section",
+    "floor_id": "10000000-0000-0000-0000-000000000001"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000013",
+    "label": "Clothing Section",
+    "type": "section",
+    "floor_id": "10000000-0000-0000-0000-000000000001"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000016",
+    "label": "Billing Section",
+    "type": "section",
+    "floor_id": "10000000-0000-0000-0000-000000000001"
+  },
+  {
+    "id": "2e676fd3-e095-46de-96d4-11f48cbcc5b6",
+    "label": "node",
+    "type": "section",
+    "floor_id": "bb31f1ff-b02e-4262-99cf-3ae8d6fb52ef"
+  },
+  {
+    "id": "d93692a6-4e4f-412a-a3c3-9b0c1c6be852",
+    "label": null,
+    "type": "section",
+    "floor_id": "f0525118-66b5-4132-9717-c622be0bc0d7"
+  },
+  {
+    "id": "fa80db72-865b-4391-a80c-fcd69e025144",
+    "label": null,
+    "type": "section",
+    "floor_id": "2a270e07-cdd5-4967-b8e7-68e358c6958b"
+  }
+]

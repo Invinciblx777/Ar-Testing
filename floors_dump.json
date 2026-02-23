@@ -1,0 +1,47 @@
+[
+  {
+    "id": "10000000-0000-0000-0000-000000000001",
+    "store_version_id": null,
+    "name": "Ground Floor"
+  },
+  {
+    "id": "82aff987-8fe9-4732-818e-d6901ad36c6c",
+    "store_version_id": "12f55658-4811-43b6-964d-f2cd04fa5872",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "5b14d347-7a06-4bac-81e4-60c0d0c79628",
+    "store_version_id": "6861030a-4048-4cfb-98bc-aae88b7713df",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "bb31f1ff-b02e-4262-99cf-3ae8d6fb52ef",
+    "store_version_id": "9bbb5c8e-c722-4ac3-b41b-43c4788c6267",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "79e5c9f8-146b-4d20-9c1f-95392c4cb0c9",
+    "store_version_id": "12f55658-4811-43b6-964d-f2cd04fa5872",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "f0525118-66b5-4132-9717-c622be0bc0d7",
+    "store_version_id": "a735f0dc-068c-42b7-8c94-58aeb7551de2",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "b5f474b9-edaa-4b72-9b0c-b091edaba17a",
+    "store_version_id": "a735f0dc-068c-42b7-8c94-58aeb7551de2",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "2a270e07-cdd5-4967-b8e7-68e358c6958b",
+    "store_version_id": "b209708a-e2b6-4276-a624-17e7c7011057",
+    "name": "Ground Floor"
+  },
+  {
+    "id": "93c19ca8-8de2-410d-9972-c72f87b43b7b",
+    "store_version_id": "b209708a-e2b6-4276-a624-17e7c7011057",
+    "name": "Ground Floor"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "6861030a-4048-4cfb-98bc-aae88b7713df",
+    "store_id": "a5322a4d-ca6e-4d0c-9af1-32adbefc2996",
+    "version_number": 1,
+    "is_published": false
+  },
+  {
+    "id": "9bbb5c8e-c722-4ac3-b41b-43c4788c6267",
+    "store_id": "a5322a4d-ca6e-4d0c-9af1-32adbefc2996",
+    "version_number": 2,
+    "is_published": true
+  },
+  {
+    "id": "12f55658-4811-43b6-964d-f2cd04fa5872",
+    "store_id": "31214350-26e6-46cc-aa3e-17ba42cd3d67",
+    "version_number": 1,
+    "is_published": false
+  },
+  {
+    "id": "a735f0dc-068c-42b7-8c94-58aeb7551de2",
+    "store_id": "31214350-26e6-46cc-aa3e-17ba42cd3d67",
+    "version_number": 2,
+    "is_published": false
+  },
+  {
+    "id": "b209708a-e2b6-4276-a624-17e7c7011057",
+    "store_id": "31214350-26e6-46cc-aa3e-17ba42cd3d67",
+    "version_number": 3,
+    "is_published": true
+  }
+]

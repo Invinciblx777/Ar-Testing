@@ -181,8 +181,45 @@ async function handleSave(supabase: any, body: any) {
         }
     }
 
-    // Sections are not overwritten here. They are managed by the Destination Management System.
-    // The ON DELETE CASCADE or explicit DB cleanup above handles orphaned sections.
+    // 4. Auto-create section entries for section-type nodes that don't have one
+    if (nodes && nodes.length > 0) {
+        const sectionNodes = nodes.filter((n: { type: string }) => n.type === 'section');
+        if (sectionNodes.length > 0) {
+            const sectionNodeIds = sectionNodes.map((n: { id: string }) => n.id);
+            // Check which section-type nodes already have a sections entry
+            const { data: existingSections } = await supabase
+                .from('sections')
+                .select('node_id')
+                .in('node_id', sectionNodeIds);
+            const existingNodeIds = new Set((existingSections || []).map((s: { node_id: string }) => s.node_id));
+            const newSectionNodes = sectionNodes.filter((n: { id: string }) => !existingNodeIds.has(n.id));
+            if (newSectionNodes.length > 0) {
+                const sectionRows = newSectionNodes.map((n: { id: string; label: string | null }) => ({
+                    node_id: n.id,
+                    floor_id: floorId,
+                    name: n.label || 'Unnamed Destination',
+                    icon: '📍',
+                }));
+                const { error: secErr } = await supabase
+                    .from('sections')
+                    .insert(sectionRows);
+                if (secErr) {
+                    console.error('Auto-create sections failed:', secErr.message);
+                }
+            }
+
+            // Also update floor_id for existing sections that have stale floor_ids
+            const staleSectionNodes = sectionNodes.filter((n: { id: string }) => existingNodeIds.has(n.id));
+            if (staleSectionNodes.length > 0) {
+                for (const n of staleSectionNodes) {
+                    await supabase
+                        .from('sections')
+                        .update({ floor_id: floorId })
+                        .eq('node_id', (n as { id: string }).id);
+                }
+            }
+        }
+    }
 
     return NextResponse.json({ success: true });
 }
